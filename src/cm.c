@@ -371,6 +371,16 @@ cmgoto (struct tty_display_info *tty, int row, int col)
       dcm = tty->Wcm->cm_abs;
     }
 
+    /* only use direct moves */
+    cost = 0;
+    p = (dcm == tty->Wcm->cm_habs
+         ? tgoto (dcm, row, col)
+         : tgoto (dcm, col, row));
+    emacs_tputs (tty, p, 1, evalcost);
+    emacs_tputs (tty, p, 1, cmputc);
+    curY (tty) = row, curX (tty) = col;
+    return;
+
   /*
    * In the following comparison, the = in <= is because when the costs
    * are the same, it looks nicer (I think) to move directly there.
